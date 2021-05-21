@@ -402,6 +402,19 @@ setMethod("belief.propagation",
               scoring.func(nbn) <- scoring.func(net)
               struct.algo(nbn)  <- struct.algo(net)
               quantiles(nbn)    <- quantiles(net)
+              
+              ##################
+              # MODIFIED for bnstruct_score
+              
+              # OLD
+              # nothing 
+              
+              # NEW
+              best.scores(nbn) <- best.scores(net)
+              all.scores(nbn)  <- all.scores(net)
+              best.dags(nbn)   <- best.dags(net)
+              all.dags(nbn)    <- all.dags(net)
+              ###################
 
               ncpts <- NULL # lapply(1:num.nodes, function(x) as.list(c(NULL)))
               

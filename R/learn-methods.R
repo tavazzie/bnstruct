@@ -9,6 +9,7 @@ setMethod("learn.network",
                    layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, 
                    mandatory.edges = NULL, ...)
           {
+            
             if (is.null(y) || !inherits(y, "BNDataset"))
               stop("A BNDataset must be provided in order to learn a network from it. ",
                    "Please take a look at the documentation of the method: > ?learn.network")
@@ -44,6 +45,7 @@ setMethod("learn.network",
                    layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE,
                    mandatory.edges = NULL, ...)
           {
+            
             dataset <- x
             bn <- BN(dataset)
             if (num.time.steps(dataset) > 1) {
@@ -76,6 +78,7 @@ setMethod("learn.dynamic.network",
                    layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE,
                    mandatory.edges = NULL, ...)
           {
+            
             if (is.null(y) || !inherits(y, "BNDataset"))
               stop("A BNDataset must be provided in order to learn a network from it. ",
                    "Please take a look at the documentation of the method: > ?learn.dynamic.network")
@@ -141,7 +144,7 @@ setMethod("learn.dynamic.network",
             
             if (!bootstrap && algo != "mmpc")
               bn <- learn.params(bn, dataset, ess, use.imputed.data)
-
+            
             return(bn)
           })
 #' @rdname learn.dynamic.network
@@ -227,6 +230,7 @@ setMethod("learn.params",
           c("BN", "BNDataset"),
           function(bn, dataset, ess = 1, use.imputed.data = FALSE)
           {
+            
             # Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
             # CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
             # so that the sum over the last dimension is always 1
@@ -235,7 +239,7 @@ setMethod("learn.params",
               bnstruct.start.log("no parameter learning possible for network learnt using the MMPC algorithm")
               return(bn)
             }
-
+            
             bnstruct.start.log("learning network parameters ... ")
             
             # just to play safe
@@ -244,7 +248,7 @@ setMethod("learn.params",
             else
               data <- as.matrix(raw.data(dataset))
             
-
+            
             # storage.mode(data) <- "integer"
             
             node.sizes <- node.sizes(bn)
@@ -252,9 +256,9 @@ setMethod("learn.params",
             n.nodes    <- num.nodes(bn)
             variables  <- variables(bn)
             
-#             storage.mode(dag) <- "integer"
+            #             storage.mode(dag) <- "integer"
             storage.mode(node.sizes) <- "integer"
-
+            
             # quantize data of continuous nodes 
             cont.nodes <- which(!discreteness(bn))
             levels <- rep( 0, n.nodes )
@@ -265,7 +269,7 @@ setMethod("learn.params",
             data <- out.data$quant
             quantiles(bn) <- out.data$quantiles
             quantiles(dataset) <- out.data$quantiles
-
+            
             #n.nodes <- dataset@num.items #dim(data)[2]
             cpts <- list("list",n.nodes)
             var.names <- c(unlist(variables))  # colnames(data)
@@ -289,16 +293,16 @@ setMethod("learn.params",
               
               dimnames(cpts[[i]])          <- dms
               names( dimnames(cpts[[i]]) ) <- dns
-                
+              
             }
             names(cpts) <- var.names
             
             #return( cpts )
             
             cpts(bn) <- cpts
-
+            
             bnstruct.end.log("parameter learning done.")
-
+            
             return(bn)
           }
 )
@@ -335,7 +339,7 @@ setMethod("learn.structure",
               
               if (use.imputed.data && !has.imputed.boots(dataset))
                 stop("Imputed samples not available. Please generate imputed samples before learning.\nSee > ?bootstrap for help.")
-
+              
               num.boots <- num.boots(dataset)
             }
             else
@@ -393,7 +397,7 @@ setMethod("learn.structure",
             }
             else
               init.net <- NULL
-
+            
             # check consistency between max.parents and max.fanin
             #if (max.fanin < max.parents) {
             #  # bnstruct.log ("bounding max.parents to max.fanin")
@@ -421,16 +425,16 @@ setMethod("learn.structure",
               initial.cpc <- NULL
             
             #if ("struct.threshold" %in% names(other.args))
-              #struct.threshold <- as.numeric(other.args$struct.threshold)
+            #struct.threshold <- as.numeric(other.args$struct.threshold)
             #else
-              #struct.threshold <- 10
-
+            #struct.threshold <- 10
+            
             # switch on algorithm
             if (algo == "sm")
             {
               # check consistency between max.parents and max.fanin
               if ( max.fanin < max.parents                                   ||
-                  (is.null(max.parents.layers) && !is.null(max.fanin.layers))  ) {
+                   (is.null(max.parents.layers) && !is.null(max.fanin.layers))  ) {
                 bnstruct.log ("SM uses 'max.parents' and 'max.parents.layers' parameters, ",
                               "but apparently you set 'max.fanin' and 'max.fanin.layers', ",
                               "changing accordingly.")
@@ -464,7 +468,7 @@ setMethod("learn.structure",
             if (algo == "sem")
             {
               bnstruct.start.log("learning the structure using SEM ...")
-
+              
               bn <- sem(bn, dataset,
                         scoring.func = c("BDeu", "AIC", "BIC")[scoring.func + 1],
                         initial.network = init.net,
@@ -490,7 +494,7 @@ setMethod("learn.structure",
             # Shall we assume the users know what they're doing?
             if (algo == "mmpc")
             {
-                if ( max.parents < max.fanin) {
+              if ( max.parents < max.fanin) {
                 bnstruct.log ("MMPC uses 'max.fanin', ",
                               "but apparently you set 'max.parents', ",
                               "changing accordingly.")
@@ -525,7 +529,7 @@ setMethod("learn.structure",
             if (algo == "hc")
             {
               if ( max.parents < max.fanin                                   ||
-                  (is.null(layer.struct) && !is.null(max.parents.layers))  ) {
+                   (is.null(layer.struct) && !is.null(max.parents.layers))  ) {
                 bnstruct.log ("HC uses 'max.fanin' and 'layer.struct' parameters, ",
                               "but apparently you set 'max.parents' and 'max.parents.layers', ",
                               "changing accordingly.")
@@ -546,25 +550,68 @@ setMethod("learn.structure",
                 {
                   data <- boot(dataset, i, use.imputed.data=use.imputed.data)
                   cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
-                  dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
+                  
+                  ##################
+                  # MODIFIED for bnstruct_score
+                  
+                  # OLD
+                  # dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
+                  #            tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
+                  #            wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                  #            mandatory.edges = mandatory.edges)
+                  # finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering, layer.struct )
+                  
+                  # NEW
+                  all.dags <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
                              tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
                              wm.max=wm.max, layering=layering, layer.struct=layer.struct,
                              mandatory.edges = mandatory.edges)
+                  dag <- tail(all.dags, n=1)[[1]]$dag
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering, layer.struct )
+                  
+                  best.scores(bn) <- append(best.scores(bn), list(tail(all.dags, n=1)[[1]]$score))
+                  best.dags(bn) <- append(best.dags(bn), list(tail(all.dags, n=1)[[1]]$dag))                   
+                  
+                  all.scores(bn) <- append(all.scores(bn), list(lapply(all.dags[-length(all.dags)], function(x) x$score)))
+                  all.dags(bn) <- append(all.dags(bn), list(lapply(all.dags[-length(all.dags)], function(x) x$dag)))
+                  
+                  ###################
+                  
                 }
                 wpdag(bn) <- finalPDAG
               }
               else
               {
                 if (is.null(initial.cpc)) {
-                    cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+                  cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                 } else {
-                    cpc <- initial.cpc
+                  cpc <- initial.cpc
                 }
-                dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                               tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
-                               wm.max=wm.max, layering=layering, layer.struct=layer.struct,
-                               mandatory.edges = mandatory.edges)
+                
+                ##################
+                # MODIFIED for bnstruct_score
+                
+                # OLD
+                # dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
+                #                tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
+                #                wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                #                mandatory.edges = mandatory.edges)
+                
+                # NEW
+                all.dags <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
+                                tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
+                                wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                                mandatory.edges = mandatory.edges)
+                dag(bn) <- tail(all.dags, n=1)[[1]]$dag
+                
+                best.scores(bn) <- append(best.scores(bn), list(tail(all.dags, n=1)[[1]]$score))
+                best.dags(bn) <- append(best.dags(bn), list(tail(all.dags, n=1)[[1]]$dag))                   
+                
+                all.scores(bn) <- append(all.scores(bn), list(lapply(all.dags[-length(all.dags)], function(x) x$score)))
+                all.dags(bn) <- append(all.dags(bn), list(lapply(all.dags[-length(all.dags)], function(x) x$dag)))
+                
+                ###############                
+                
               }
               bnstruct.end.log("learning using HC completed.")
             } # end if algo == hc
@@ -584,7 +631,7 @@ setMethod("learn.structure",
                 in.dag <- dag(init.net)
               else
                 in.dag <- NULL
-                            
+              
               if (bootstrap)
               {
                 finalPDAG <- matrix(0,num.nodes,num.nodes)
@@ -604,29 +651,73 @@ setMethod("learn.structure",
                   {
                     cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                   }
-                  dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                             tabu.tenure = tabu.tenure, max.parents = max.parents,
-                             init.net = in.dag, wm.max=wm.max, layering=layering, layer.struct=layer.struct,
-                             mandatory.edges = mandatory.edges )
+                  
+                  ##################
+                  # MODIFIED for bnstruct_score
+                  
+                  # OLD
+                  # dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
+                  #            tabu.tenure = tabu.tenure, max.parents = max.parents,
+                  #            init.net = in.dag, wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                  #            mandatory.edges = mandatory.edges )
+                  # finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering, layer.struct )
+                  # 
+                  
+                  # NEW
+                  all.dags <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
+                                  tabu.tenure = tabu.tenure, max.parents = max.parents,
+                                  init.net = in.dag, wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                                  mandatory.edges = mandatory.edges )
+                  dag <- tail(all.dags, n=1)[[1]]$dag
+                  
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering, layer.struct )
+                  
+                  best.scores(bn) <- append(best.scores(bn), list(tail(all.dags, n=1)[[1]]$score))
+                  best.dags(bn) <- append(best.dags(bn), list(tail(all.dags, n=1)[[1]]$dag))                   
+                  
+                  all.scores(bn) <- append(all.scores(bn), list(lapply(all.dags[-length(all.dags)], function(x) x$score)))
+                  all.dags(bn) <- append(all.dags(bn), list(lapply(all.dags[-length(all.dags)], function(x) x$dag)))
+                  
+                  ##################
+                  
                 }
                 wpdag(bn) <- finalPDAG
               }
               else
               {
                 if (use.cpc)
-                    if (!is.null(initial.cpc)) {
-                      cpc <- initial.cpc
-                    } else {
-                      cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering,
-                                   layer.struct, max.fanin=max.fanin, mandatory.edges = mandatory.edges )
-                    }
+                  if (!is.null(initial.cpc)) {
+                    cpc <- initial.cpc
+                  } else {
+                    cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering,
+                                 layer.struct, max.fanin=max.fanin, mandatory.edges = mandatory.edges )
+                  }
                 else
                   cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
-                dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                               tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
-                               wm.max=wm.max, layering=layering, layer.struct=layer.struct,
-                               mandatory.edges = mandatory.edges )
+                
+                ##################
+                # MODIFIED for bnstruct_score
+                
+                # OLD
+                # dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
+                #                tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
+                #                wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                #                mandatory.edges = mandatory.edges )
+                
+                # NEW
+                all.dags <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
+                                tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
+                                wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                                mandatory.edges = mandatory.edges )
+                dag(bn) <- tail(all.dags, n=1)[[1]]$dag
+                
+                best.scores(bn) <- append(best.scores(bn), list(tail(all.dags, n=1)[[1]]$score))
+                best.dags(bn) <- append(best.dags(bn), list(tail(all.dags, n=1)[[1]]$dag))                   
+                
+                all.scores(bn) <- append(all.scores(bn), list(lapply(all.dags[-length(all.dags)], function(x) x$score)))
+                all.dags(bn) <- append(all.dags(bn), list(lapply(all.dags[-length(all.dags)], function(x) x$dag)))
+                
+                ####################
               }
               bnstruct.end.log("learning using MMHC completed.")
             } # end if algo == mmhc

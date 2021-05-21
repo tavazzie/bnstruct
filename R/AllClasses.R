@@ -29,6 +29,10 @@ setClassUnion("listOrNULL", c("list", "NULL"))
 #'   \item{\code{struct.algo}:}{algorithm used in structure learning (when performed)}
 #'   \item{\code{num.time.steps}:}{number of instants in which the network is observed (1, unless it is a Dynamic Bayesian Network)}
 #'   \item{\code{discreteness}:}{\code{TRUE} if variable is discrete, \code{FALSE} if variable is continue}
+#'   \item{\code{best.scores}:}{list of the best scores} # MODIFIED for bnstruct_score
+#'   \item{\code{all.scores}:}{list of lists of all scores} # MODIFIED for bnstruct_score
+#'   \item{\code{best.dags}:}{list of the best dags} # MODIFIED for bnstruct_score
+#'   \item{\code{all.dags}:}{list of lists of all dags} # MODIFIED for bnstruct_score
 #' }
 #' 
 #' @name BN-class
@@ -46,6 +50,13 @@ setClass("BN",
            node.sizes     = "numeric",
            cpts           = "list",
            dag            = "matrix",
+           ##################
+           # MODIFIED for bnstruct_score
+           all.dags       = "list",
+           best.dags      = "list",
+           all.scores     = "list",
+           best.scores    = "list",
+           ################
            wpdag          = "matrix",
            scoring.func   = "character",
            struct.algo    = "character",
@@ -60,6 +71,13 @@ setClass("BN",
            node.sizes     = c(0),
            cpts           = list(NULL),
            dag            = matrix(),
+           ##################
+           # MODIFIED for bnstruct_score
+           all.dags       = list(),
+           best.dags      = list(),
+           all.scores     = list(),
+           best.scores    = list(),
+           ################
            wpdag          = matrix(),
            scoring.func   = "",
            struct.algo    = "",

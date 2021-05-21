@@ -1233,6 +1233,74 @@ setGeneric("cpts", function(x) { standardGeneric("cpts") } )
 #' @exportMethod dag
 setGeneric("dag", function(x) { standardGeneric("dag") } )
 
+##################
+# MODIFIED for bnstruct_score
+
+# OLD
+# nothing 
+
+# NEW
+#' get best adjacency matrices.
+#' 
+#' Return a list containing the adjacency matries of directed acyclic graphes.
+#' 
+#' @name best.dags
+#' @rdname best.dags
+#'
+#' @param x an object.
+#' 
+#' @return list of the adjacency matrices.
+#' 
+#' @exportMethod best.dags
+setGeneric("best.dags", function(x) { standardGeneric("best.dags") } )
+
+
+#' get all adjacency matrices.
+#' 
+#' Return a list of lists containing the adjacency matries of directed acyclic graphes.
+#' 
+#' @name all.dags
+#' @rdname all.dags
+#'
+#' @param x an object.
+#' 
+#' @return list of lists of adjacency matrices.
+#' 
+#' @exportMethod all.dags
+setGeneric("all.dags", function(x) { standardGeneric("all.dags") } )
+
+
+#' get best scores.
+#' 
+#' Return a list of the best computed scores.
+#' 
+#' @name best.scores
+#' @rdname best.scores
+#'
+#' @param x an object.
+#' 
+#' @return list of the best computed scores.
+#' 
+#' @exportMethod best.scores
+setGeneric("best.scores", function(x) { standardGeneric("best.scores") } )
+
+
+#' get all scores.
+#' 
+#' Return a list of lists of all computed scores.
+#' 
+#' @name all.scores
+#' @rdname all.scores
+#'
+#' @param x an object.
+#' 
+#' @return list of lists of all computed scores.
+#' 
+#' @exportMethod all.scores
+setGeneric("all.scores", function(x) { standardGeneric("all.scores") } )
+##############################
+
+
 
 #' get the WPDAG of an object.
 #' 
@@ -1672,6 +1740,53 @@ setGeneric("cpts<-", function(x, value) { standardGeneric("cpts<-") } )
 #' @exportMethod dag<-
 setGeneric("dag<-", function(x, value) { standardGeneric("dag<-") } )
 
+##################
+# MODIFIED for bnstruct_score
+# NEW
+#' set best scores of an object.
+#' 
+#' @name best.scores<-
+#' @rdname best.scores-set
+#' 
+#' @param x an object.
+#' @param value list containing the best scores
+#'         
+#' @exportMethod best.scores<-
+setGeneric("best.scores<-", function(x, value) { standardGeneric("best.scores<-") } )
+
+#' set all scores of an object.
+#' 
+#' @name all.scores<-
+#' @rdname all.scores-set
+#' 
+#' @param x an object.
+#' @param value list containing the best scores
+#'         
+#' @exportMethod all.scores<-
+setGeneric("all.scores<-", function(x, value) { standardGeneric("all.scores<-") } )
+
+#' set best dags object.
+#' 
+#' @name best.dags<-
+#' @rdname best.dags-set
+#' 
+#' @param x an object.
+#' @param value list containing the best dags
+#'         
+#' @exportMethod best.dags<-
+setGeneric("best.dags<-", function(x, value) { standardGeneric("best.dags<-") } )
+
+#' set all dags of an object.
+#' 
+#' @name all.dags<-
+#' @rdname all.dags-set
+#' 
+#' @param x an object.
+#' @param value list containing the best scores
+#'         
+#' @exportMethod all.dags<-
+setGeneric("all.dags<-", function(x, value) { standardGeneric("all.dags<-") } )
+##############################
 
 #' set WPDAG of the object.
 #' 
