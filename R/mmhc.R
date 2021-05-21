@@ -79,16 +79,6 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
   global.best.g <- curr.g
   global.best.score <- sum(curr.score.nodes)
   
-  ##################
-  # MODIFIED for bnstruct_score
-  
-  # OLD
-  # nothing
-  
-  # NEW
-  all.iterations <- list(list(score=global.best.score, dag=global.best.g))
-  ##################
-  
   # tabu list
   tabu <- array(0L, c(n.nodes,n.nodes,tabu.tenure))
   tabu.pt <- 1
@@ -184,19 +174,6 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
     
     # print(c(tabu.pt,best.node,next.pert[best.node],sum(curr.score.nodes)))
     
-    ##################
-    # MODIFIED for bnstruct_score
-    
-    # OLD
-    # nothing
-    
-    # NEW
-    curr.score <- sum(curr.score.nodes)
-    print(paste0("### Current score = ", curr.score, " ###"))
-    all.iterations <- append(all.iterations, list(list(score=curr.score, dag=curr.g)))
-    #######################
-    
-    
     if( global.best.score < sum(curr.score.nodes) ) # check for global best
     {
       wm.count <- 0
@@ -212,18 +189,7 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
     # print(curr.g)
   }
   
-  ##################
-  # MODIFIED for bnstruct_score
-  
-  # OLD
-  # return(global.best.g)
-  
-  # NEW
-  all.iterations <- append(all.iterations, list(list(score=global.best.score, dag=global.best.g)))
-  print(paste0("### Best score = ", global.best.score, " ###"))
-  
-  return(all.iterations)
-  ##########################
+  return(global.best.g)
 }
 
 

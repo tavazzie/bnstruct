@@ -7,9 +7,9 @@
 setMethod("initialize",
           "BN",
           function(.Object, dataset = NULL, ...)#,
-            #                    algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
-            #                    layering = c(), max.fanin.layers = NULL,
-            #                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
+#                    algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
+#                    layering = c(), max.fanin.layers = NULL,
+#                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
           {
             x <- .Object
             
@@ -23,29 +23,15 @@ setMethod("initialize",
               dag(x)            <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
               wpdag(x)          <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
               num.time.steps(x) <- num.time.steps(dataset)
-              #               validObject(x)
-              # 
-              #               x <- learn.structure(x, dataset, algo = algo, scoring.func = scoring.func, alpha = alpha, ess = ess, bootstrap = bootstrap,
-              #                                    layering = layering, max.fanin.layers = max.fanin.layers,
-              #                                    max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data)
-              #               
-              #               validObject(x)
-              # 
-              #               x <- learn.params(x, dataset, ess = ess)
-              
-              ##################
-              # MODIFIED for bnstruct_score
-              
-              # OLD
-              # nothing 
-              
-              # NEW
-              best.scores(x) <- list()
-              all.scores(x) <- list()
-              best.dags(x) <- list()
-              all.dags(x) <- list()
-              ##################
-              
+#               validObject(x)
+# 
+#               x <- learn.structure(x, dataset, algo = algo, scoring.func = scoring.func, alpha = alpha, ess = ess, bootstrap = bootstrap,
+#                                    layering = layering, max.fanin.layers = max.fanin.layers,
+#                                    max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data)
+#               
+#               validObject(x)
+# 
+#               x <- learn.params(x, dataset, ess = ess)
             }
             validObject(x)
             return(x)
@@ -101,12 +87,12 @@ setMethod("initialize",
 #' 
 #' @export
 BN <- function(dataset = NULL, ...)#, algo = "mmhc", scoring.func = 0, alpha = 0.05, ess = 1, bootstrap = FALSE,
-  #                layering = c(), max.fanin.layers = NULL,
-  #                max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
+#                layering = c(), max.fanin.layers = NULL,
+#                max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
 {
   object <- new("BN", dataset = dataset, ...)#, scoring.func = scoring.func, algo = algo, alpha = alpha, ess = ess, bootstrap = bootstrap,
-  #                 layering = layering, max.fanin.layers = max.fanin.layers,
-  #                 max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data, ...)
+#                 layering = layering, max.fanin.layers = max.fanin.layers,
+#                 max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data, ...)
   return(object)
 }
 
@@ -273,7 +259,7 @@ setReplaceMethod("discreteness",
                  function(x, value)
                  {
                    if (inherits(value, "character"))
-                     slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
+                    slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
                    else # is logical
                      slot(x, "discreteness") <- value
                    validObject(x)
@@ -413,9 +399,9 @@ setMethod("get.most.probable.values",
             node.sizes <- node.sizes(bn)
             discrete   <- discreteness(bn)
             quantiles  <- quantiles(bn)
-            
+
             mpv  <- array(rep(0,num.nodes), dim=c(num.nodes), dimnames=list(variables))
-            
+
             sorted.nodes <- topological.sort(dag)
             
             dim.vars   <- lapply(1:num.nodes,
@@ -439,7 +425,7 @@ setMethod("get.most.probable.values",
               {
                 #pot  <- cpts[[node]]
                 #vars <- c(unlist(dim.vars[[node]]))
-                
+
                 # sum out parent variables
                 if (length(dim.vars[[node]]) > 1)
                 {
@@ -464,7 +450,7 @@ setMethod("get.most.probable.values",
                   mpv[node] <- sample(1:node.sizes[node], 1, replace=TRUE, prob=pot)
                 }
               } else {
-                mpv[node] <- prev.values[node]
+                  mpv[node] <- prev.values[node]
               }
               
               # propagate information from parent nodes to children
@@ -481,7 +467,7 @@ setMethod("get.most.probable.values",
                 }
               }
             }
-            
+
             # sample continuous values, if possible
             if (length(quantiles) > 0) {
               for (node in sorted.nodes) {
@@ -492,87 +478,10 @@ setMethod("get.most.probable.values",
                 }
               }
             }
-            
+
             return(mpv)
           })
 
-##################
-# MODIFIED for bnstruct_score
-
-# OLD
-# nothing
-
-# NEW
-#' @aliases best.scores,BN
-#' @rdname best.scores
-setMethod("best.scores", "BN", function(x) { return(slot(x, "best.scores")) } )
-
-#' @name best.scores<-
-#' @aliases best.scores<-,BN-method
-#' @docType methods
-#' @rdname best.scores-set
-setReplaceMethod("best.scores",
-                 "BN",
-                 function(x, value)
-                 {
-                   slot(x, "best.scores") <- value
-                   validObject(x)
-                   return(x)
-                 })
-
-#' @aliases all.scores,BN
-#' @rdname all.scores
-setMethod("all.scores", "BN", function(x) { return(slot(x, "all.scores")) } )
-
-#' @name all.scores<-
-#' @aliases all.scores<-,BN-method
-#' @docType methods
-#' @rdname all.scores-set
-setReplaceMethod("all.scores",
-                 "BN",
-                 function(x, value)
-                 {
-                   slot(x, "all.scores") <- value
-                   validObject(x)
-                   return(x)
-                 })
-
-#' @aliases best.dags,BN
-#' @rdname best.dags
-setMethod("best.dags", "BN", function(x) { return(slot(x, "best.dags")) } )
-
-#' @name best.dags<-
-#' @aliases best.dags<-,BN-method
-#' @docType methods
-#' @rdname best.dags-set
-setReplaceMethod("best.dags",
-                 "BN",
-                 function(x, value)
-                 {
-                   slot(x, "best.dags") <- value
-                   validObject(x)
-                   return(x)
-                 })
-
-#' @aliases all.dags,BN
-#' @rdname all.dags
-setMethod("all.dags", "BN", function(x) { return(slot(x, "all.dags")) } )
-
-#' @name all.dags<-
-#' @aliases all.dags<-,BN-method
-#' @docType methods
-#' @rdname all.dags-set
-setReplaceMethod("all.dags",
-                 "BN",
-                 function(x, value)
-                 {
-                   slot(x, "all.dags") <- value
-                   validObject(x)
-                   return(x)
-                 })
-
-
-######################
 
 # # ' @rdname query
 # # ' @aliases query,BN
@@ -605,57 +514,57 @@ setReplaceMethod("all.dags",
 #setMethod("print.BN",
 #          "BN",
 print.BN <- function(x, ...)
-{
-  str <- "\nBayesian Network: "
-  str <- paste(str, name(x), sep = '')
-  str <- paste(str, "\n", sep = '')
-  cat(str)
-  str <- "\nnum.nodes "
-  str <- paste(str, num.nodes(x), sep = '')
-  str <- paste(str, "\n", sep = '')
-  cat(str)
-  str <- "\nvariables\n"
-  cat(str)
-  cat(variables(x))
-  str <- "\ndiscreteness\n"
-  cat(str)
-  cat(discreteness(x))
-  str <- "\nnode.sizes\n"
-  cat(str)
-  cat(node.sizes(x))
-  if (num.time.steps(x) > 1) {
-    str <- "\ntime steps\n"
-    cat(str)
-    cat(num.time.steps(x))
-  }
-  
-  if (num.nodes(x) > 0 && (is.element(1,dag(x)) || length(which(wpdag(x) != 0)) > 0))
-  {
-    
-    if (is.element(1,dag(x)))
-    {
-      colnames(dag(x)) <- variables(x)
-      rownames(dag(x)) <- variables(x)
-      cat('\nAdjacency matrix:\n')
-      print(dag(x))
-    }
-    
-    if (length(which(wpdag(x) != 0)) > 0)
-    {
-      colnames(wpdag(x)) <- variables(x)
-      rownames(wpdag(x)) <- variables(x)
-      cat('\nWPDAG:\n')
-      print(wpdag(x))
-    }  
-    
-    cat("\nConditional probability tables:")
-    print(cpts(x))
-    
-  }
-  
-  cat("\n")
-  
-}#)
+          {
+            str <- "\nBayesian Network: "
+            str <- paste(str, name(x), sep = '')
+            str <- paste(str, "\n", sep = '')
+            cat(str)
+            str <- "\nnum.nodes "
+            str <- paste(str, num.nodes(x), sep = '')
+            str <- paste(str, "\n", sep = '')
+            cat(str)
+            str <- "\nvariables\n"
+            cat(str)
+            cat(variables(x))
+            str <- "\ndiscreteness\n"
+            cat(str)
+            cat(discreteness(x))
+            str <- "\nnode.sizes\n"
+            cat(str)
+            cat(node.sizes(x))
+            if (num.time.steps(x) > 1) {
+              str <- "\ntime steps\n"
+              cat(str)
+              cat(num.time.steps(x))
+            }
+            
+            if (num.nodes(x) > 0 && (is.element(1,dag(x)) || length(which(wpdag(x) != 0)) > 0))
+            {
+              
+              if (is.element(1,dag(x)))
+              {
+                colnames(dag(x)) <- variables(x)
+                rownames(dag(x)) <- variables(x)
+                cat('\nAdjacency matrix:\n')
+                print(dag(x))
+              }
+                
+              if (length(which(wpdag(x) != 0)) > 0)
+              {
+                colnames(wpdag(x)) <- variables(x)
+                rownames(wpdag(x)) <- variables(x)
+                cat('\nWPDAG:\n')
+                print(wpdag(x))
+              }  
+              
+              cat("\nConditional probability tables:")
+              print(cpts(x))
+              
+            }
+            
+            cat("\n")
+            
+          }#)
 
 
 #' plot a \code{\link{BN}} as a picture.
@@ -682,136 +591,136 @@ print.BN <- function(x, ...)
 #' @export
 plot.BN <- 
   function( x, method = "default", use.node.names = TRUE, frac = 0.2, max.weight = max(dag(x)),
-            node.size.lab=14, node.col = rep('white',num.nodes(x)),
-            plot.wpdag = FALSE, ...)
-  {
-    
-    # check for required packages
-    if (!requireNamespace("graph", quietly=T))
-      stop("this function requires the graph package.")
-    method <- tolower(method)
-    if (method == "default") {
-      if (!requireNamespace("Rgraphviz", quietly=T))
-        stop("this function requires the Rgraphviz package.")
-    } else if (method == "qgraph") {
-      if (!requireNamespace("qgraph", quietly=T))
-        stop("this function requires the qgraph package when using 'method = \"qgraph\"'.") 
-    } else {
-      stop("plotting method not available in bnstruct. Please use one between 'default' and 'qgraph'.")
-    }
-    
-    
-    # adjacency matrix
-    if (plot.wpdag || (!is.element(1,dag(x)) && length(which(wpdag(x) != 0)) > 0))
-      mat <- wpdag(x)
-    else
-      mat <- dag(x)
-    
-    if (plot.wpdag || (!is.element(1,dag(x)) && length(which(wpdag(x) != 0)) > 0))
-    {
-      if (missing(max.weight))
-        max.weight <- max(mat)
-      if (missing(node.col))
-        node.col <- rep('white',ncol(mat))
-    }
-    
-    num.nodes <- num.nodes(x)
-    variables <- variables(x)
-    
-    if (method == "default") {
-      bngzplot(x, mat, num.nodes, variables, use.node.names,
-               frac, max.weight, node.size.lab, node.col)
-    } else {
-      plist <- list(...)
-      bnqgplot(mat, num.nodes, variables, use.node.names,
-               frac, max.weight, node.col, plist)
-    }
-  }            
+                    node.size.lab=14, node.col = rep('white',num.nodes(x)),
+                    plot.wpdag = FALSE, ...)
+          {
+            
+            # check for required packages
+            if (!requireNamespace("graph", quietly=T))
+              stop("this function requires the graph package.")
+            method <- tolower(method)
+            if (method == "default") {
+                if (!requireNamespace("Rgraphviz", quietly=T))
+                    stop("this function requires the Rgraphviz package.")
+            } else if (method == "qgraph") {
+                if (!requireNamespace("qgraph", quietly=T))
+                    stop("this function requires the qgraph package when using 'method = \"qgraph\"'.") 
+            } else {
+                stop("plotting method not available in bnstruct. Please use one between 'default' and 'qgraph'.")
+            }
+
+            
+            # adjacency matrix
+            if (plot.wpdag || (!is.element(1,dag(x)) && length(which(wpdag(x) != 0)) > 0))
+              mat <- wpdag(x)
+            else
+              mat <- dag(x)
+            
+            if (plot.wpdag || (!is.element(1,dag(x)) && length(which(wpdag(x) != 0)) > 0))
+            {
+              if (missing(max.weight))
+                max.weight <- max(mat)
+              if (missing(node.col))
+                node.col <- rep('white',ncol(mat))
+            }
+            
+            num.nodes <- num.nodes(x)
+            variables <- variables(x)
+
+            if (method == "default") {
+                bngzplot(x, mat, num.nodes, variables, use.node.names,
+                            frac, max.weight, node.size.lab, node.col)
+            } else {
+                plist <- list(...)
+                bnqgplot(mat, num.nodes, variables, use.node.names,
+                            frac, max.weight, node.col, plist)
+            }
+}            
 
 bngzplot <- function(x, mat, num.nodes, variables, use.node.names, frac, max.weight,
-                     node.size.lab, node.col) {
-  
-  mat.th <- mat
-  mat.th[mat <  frac*max.weight] <- 0
-  mat.th[mat >= frac*max.weight] <- 1
-  
-  # node names
-  if (use.node.names && length(variables) > 0)
-    node.names <- variables
-  else
-    node.names <- as.character(1:num.nodes)
-  # build graph
-  rownames(mat.th) <- node.names
-  colnames(mat.th) <- node.names
-  
-  # node colors
-  node.fill <- as.list(node.col)
-  names(node.fill) <- node.names
-  
-  g <- new("graphAM", adjMat=mat.th, edgemode="directed")
-  
-  en <- Rgraphviz::edgeNames(g,recipEdges="distinct")
-  if (sum(mat) == 0) {
-    g <- Rgraphviz::layoutGraph(g, layoutType="neato")
-  } else {
-    g <- Rgraphviz::layoutGraph(g)
-  }
-  
-  # set edge darkness proportional to confidence
-  conf <- mat.th*pmax(mat,t(mat)) # both values to the maximum for edges with 2 directions
-  col <- colors()[253-100*(t(conf)[t(conf) >= frac*max.weight]/max.weight)]
-  if (sum(mat) == 0) {
-    col <- rep(colors()[1], length(en))
-  }
-  names(col) <- en
-  
-  # remove arrowheads from undirected edges
-  ahs <- graph::edgeRenderInfo(g)$arrowhead
-  ats <- graph::edgeRenderInfo(g)$arrowtail
-  dirs <- graph::edgeRenderInfo(g)$direction
-  ahs[dirs=="both"] <- ats[dirs=="both"] <- "none"
-  graph::edgeRenderInfo(g) <- list(col=col,lwd=2,arrowhead=ahs,arrowtail=ats)
-  graph::nodeRenderInfo(g) <- list(fill=node.fill, fontsize=node.size.lab)
-  
-  Rgraphviz::renderGraph(g)
+                      node.size.lab, node.col) {
+
+            mat.th <- mat
+            mat.th[mat <  frac*max.weight] <- 0
+            mat.th[mat >= frac*max.weight] <- 1
+            
+            # node names
+            if (use.node.names && length(variables) > 0)
+              node.names <- variables
+            else
+              node.names <- as.character(1:num.nodes)
+            # build graph
+            rownames(mat.th) <- node.names
+            colnames(mat.th) <- node.names
+
+            # node colors
+            node.fill <- as.list(node.col)
+            names(node.fill) <- node.names
+
+            g <- new("graphAM", adjMat=mat.th, edgemode="directed")
+
+            en <- Rgraphviz::edgeNames(g,recipEdges="distinct")
+            if (sum(mat) == 0) {
+              g <- Rgraphviz::layoutGraph(g, layoutType="neato")
+            } else {
+              g <- Rgraphviz::layoutGraph(g)
+            }
+
+            # set edge darkness proportional to confidence
+            conf <- mat.th*pmax(mat,t(mat)) # both values to the maximum for edges with 2 directions
+            col <- colors()[253-100*(t(conf)[t(conf) >= frac*max.weight]/max.weight)]
+            if (sum(mat) == 0) {
+              col <- rep(colors()[1], length(en))
+            }
+            names(col) <- en
+            
+            # remove arrowheads from undirected edges
+            ahs <- graph::edgeRenderInfo(g)$arrowhead
+            ats <- graph::edgeRenderInfo(g)$arrowtail
+            dirs <- graph::edgeRenderInfo(g)$direction
+            ahs[dirs=="both"] <- ats[dirs=="both"] <- "none"
+            graph::edgeRenderInfo(g) <- list(col=col,lwd=2,arrowhead=ahs,arrowtail=ats)
+            graph::nodeRenderInfo(g) <- list(fill=node.fill, fontsize=node.size.lab)
+
+            Rgraphviz::renderGraph(g)
 }
 
 bnqgplot <- function(mat, num.nodes, variables, use.node.names,
-                     frac, max.weight, node.col, ...) {
-  
-  # parse ... parameters
-  plist <- unlist(list(...), recursive=F)
-  parnames <- names(plist)
-  
-  if (use.node.names && length(variables) > 0)
-    node.names <- variables
-  else
-    node.names <- as.character(1:num.nodes)
-  
-  # build graph
-  rownames(mat) <- node.names
-  colnames(mat) <- node.names
-  
-  # node colors
-  node.fill <- as.list(node.col)
-  names(node.fill) <- node.names
-  plist[["input"]] <- mat
-  
-  if (!("color" %in% parnames)) {
-    plist[["color"]] <- node.col
-  }
-  if (!("minumum" %in% parnames)) {
-    plist[["minimum"]] <- frac * max.weight
-  }
-  if (!("directed" %in% parnames)) {
-    plist[["directed"]] <- TRUE
-  }
-  
-  if (!("labels" %in% parnames)) {
-    plist[["labels"]] <- node.names
-  }
-  
-  do.call(qgraph::qgraph, plist)
+                    frac, max.weight, node.col, ...) {
+
+            # parse ... parameters
+            plist <- unlist(list(...), recursive=F)
+            parnames <- names(plist)
+
+            if (use.node.names && length(variables) > 0)
+              node.names <- variables
+            else
+              node.names <- as.character(1:num.nodes)
+
+            # build graph
+            rownames(mat) <- node.names
+            colnames(mat) <- node.names
+
+            # node colors
+            node.fill <- as.list(node.col)
+            names(node.fill) <- node.names
+            plist[["input"]] <- mat
+
+            if (!("color" %in% parnames)) {
+                plist[["color"]] <- node.col
+            }
+            if (!("minumum" %in% parnames)) {
+                plist[["minimum"]] <- frac * max.weight
+            }
+            if (!("directed" %in% parnames)) {
+                plist[["directed"]] <- TRUE
+            }
+
+            if (!("labels" %in% parnames)) {
+                plist[["labels"]] <- node.names
+            }
+
+            do.call(qgraph::qgraph, plist)
 }
 
 
@@ -858,12 +767,12 @@ setMethod("sample.row", "BN",
             
             dim.vars   <- lapply(1:num.nodes,
                                  function(x)
-                                   match(
-                                     c(unlist(
-                                       names(dimnames(cpts[[x]]))
-                                     )),
-                                     c(variables)
-                                   )
+                                     match(
+                                       c(unlist(
+                                         names(dimnames(cpts[[x]]))
+                                       )),
+                                       c(variables)
+                                     )
             )
             
             for (node in sorted.nodes)
@@ -884,7 +793,7 @@ setMethod("sample.row", "BN",
                 mpv[node] <- sample(1:node.sizes[node], 1, replace=T, prob=cpt)
               }
             }
-            
+
             # sample continuous values, if possible
             if (length(quantiles) > 0) {
               for (node in sorted.nodes) {
@@ -900,7 +809,7 @@ setMethod("sample.row", "BN",
               missing.prob <- runif(num.nodes, 0, 1)
               mpv[which(missing.prob < mar)] <- NA
             }
-            
+                
             return(mpv)
           })
 
@@ -924,7 +833,7 @@ setMethod("sample.dataset",c("BN"),
             #storage.mode(obs) <- "integer"
             
             bnd <- BNDataset(obs, discreteness(x), variables(x), node.sizes(x))
-            
+           
             return(bnd)
           })
 
@@ -984,26 +893,26 @@ edge.dir.wpdag <- function (x, use.node.names = TRUE)
     mat <- wpdag(x)
   else
     mat <- dag(x)
-  
+
   num.nodes <- num.nodes(x)
   variables <- variables(x)
-  
-  if (use.node.names && length(variables) > 0)
+
+    if (use.node.names && length(variables) > 0)
     node.names <- variables
   else node.names <- as.character(1:num.nodes)
-  
+
   rownames(mat) <- node.names
   colnames(mat) <- node.names
-  
+
   # Indexes of element inside WPDAG lower triangular matrix
   ltel <- which(lower.tri(mat, diag = FALSE), arr.ind=T)
   # Respective elements inside WPDAG upper triangular matrix
   utel <- cbind(ltel[,2], ltel[,1])
-  
+
   # Find pairs of nodes [i,j] with an edge directed from i to j
   nodes.dir.l <- ltel[which(mat[ltel]>mat[utel]), ]
   nodes.dir.u <- utel[which(mat[utel]>mat[ltel]), ]
-  
+
   ### Find number of occurrences of directed edges ###
   # Count edges occurence for each pair of nodes
   edge.occurr.l <- mat[nodes.dir.l]
@@ -1015,11 +924,11 @@ edge.dir.wpdag <- function (x, use.node.names = TRUE)
   edge.rev.occurr.l <- mat[nodes.rev.l]
   edge.rev.occurr.u <- mat[nodes.rev.u]
   edge.rev.occurr <- c(edge.rev.occurr.l, edge.rev.occurr.u)
-  
+
   # Name of nodes with directed edges
   nodes.start.l <- rownames(mat)[nodes.dir.l[,1]]
   nodes.stop.l <- rownames(mat)[nodes.dir.l[,2]]
-  
+
   nodes.start.u <- rownames(mat)[nodes.dir.u[,1]]
   nodes.stop.u <- rownames(mat)[nodes.dir.u[,2]]
   # Combine together pairs of nodes (edges from nodes.start to nodes.stop)
@@ -1028,7 +937,7 @@ edge.dir.wpdag <- function (x, use.node.names = TRUE)
   nodes.dir <- cbind(nodes.start, nodes.stop)
   # Combine pairs of nodes (names) with info about edges occurrence 
   edge.directed.wpdag <- cbind(nodes.dir, edge.occurr, edge.rev.occurr)
-  
+
   return(edge.directed.wpdag)
 }
 
@@ -1054,7 +963,7 @@ label.edges <- function(dgraph, layering = NULL, layer.struct = NULL)
     n.layers = length(unique(layering))
     for( l in 1:(n.layers-1) ) {
       label[ intersect(xedge,which(layering==l)), intersect(yedge,which(layering>l)) ] <- 
-        dgraph[ intersect(xedge,which(layering==l)), intersect(yedge,which(layering>l)) ]
+      dgraph[ intersect(xedge,which(layering==l)), intersect(yedge,which(layering>l)) ]
     }    
   } 
   
@@ -1096,19 +1005,19 @@ label.edges <- function(dgraph, layering = NULL, layer.struct = NULL)
       }
     }
   }
-  
+
   # enforce layer.struct, if present
   if (!is.null(layering) && !is.null(layer.struct)) {
     layers <- matrix(1L, n.nodes, n.nodes)
     for (i in 1:n.layers) {
-      for (j in 1:n.layers) {
-        layers[which(layering == i), which(layering == j)] <- layer.struct[i, j]
-      }
+        for (j in 1:n.layers) {
+            layers[which(layering == i), which(layering == j)] <- layer.struct[i, j]
+        }
     }
     diag(layers) <- 0
     label <- label & layers
   }
-  
+
   return(label)
 }
 
